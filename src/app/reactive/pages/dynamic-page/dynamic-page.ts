@@ -1,6 +1,6 @@
 import { Component, inject} from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray, FormControl} from '@angular/forms';
 import { FormUtils } from '../../../utils/form-util';
 @Component({
   selector: 'dynamic-page',
@@ -21,15 +21,30 @@ export class DynamicPage {
   Validators.minLength(3)),
   });
 
+  newFavorite = new FormControl('', [Validators.required, Validators.minLength(3)], []);
+  //newFavorite = this.fb.control([])
+
   get favoriteGames() {
     return this.myForm.get('favoriteGames') as FormArray;
   }
 
-  // isValidFieldInArray(form: FormArray, index: number) {
-  //   return form.controls[index].errors && form.controls[index].touched;
-  // }
+  addFavorite() {
+    if (this.newFavorite.invalid) return;
+    const newGame = this.newFavorite.value;
+    this.favoriteGames.push(this.fb.control(newGame, [Validators.required, Validators.minLength(3)], []));
+    this.newFavorite.reset();
+  }
 
-  // getFieldErrorInArray(form: FormArray, index: number) {
-  //   return form.controls[index].errors && form.controls[index].touched;
-  // }
+  deleteFavorite(index: number) {    
+    this.favoriteGames.removeAt(index);
+  }
+
+  onSubmit() {
+    if (this.myForm.invalid) {
+      this.myForm.markAllAsTouched();
+      return;
+    }
+    console.log(this.myForm.value);
+  }
+
 }
